@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Timetable</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Scripts -->
+    <script>
+    let sortDirection = true;
+
+    // 🔃 Sort Table (toggle asc/desc)
+    function sortTable(col) {
+        let table = document.querySelector(".timetable");
+        let rows = Array.from(table.rows).slice(1);
+
+        let isNumeric = col === 1;
+
+        rows.sort((a, b) => {
+            let valA = a.cells[col].innerText;
+            let valB = b.cells[col].innerText;
+
+            return sortDirection
+                ? (isNumeric ? valA - valB : valA.localeCompare(valB))
+                : (isNumeric ? valB - valA : valB.localeCompare(valA));
+        });
+
+        sortDirection = !sortDirection;
+
+        rows.forEach(row => table.appendChild(row));
+    }
+
+    // 🔍 Search
+    function searchTable() {
+        let input = document.getElementById("search").value.toLowerCase();
+        let rows = document.querySelectorAll(".timetable tr");
+
+        rows.forEach((row, index) => {
+            if (index === 0) return;
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(input) ? "" : "none";
+        });
+    }
+
+    // 🌙 Dark Mode
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+
+        const btn = document.getElementById("theme-btn");
+
+        if (document.body.classList.contains("dark-mode")) {
+            localStorage.setItem("theme", "dark");
+            btn.innerText = "☀️";
+        } else {
+            localStorage.setItem("theme", "light");
+            btn.innerText = "🌙";
+        }
+    }
+
+    window.onload = function () {
+        const btn = document.getElementById("theme-btn");
+
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-mode");
+            btn.innerText = "☀️";
+        }
+    };
+    </script>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/login">Teacher</a>
+        <a href="/admin-login">Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Dark Mode Button -->
+    <button onclick="toggleDarkMode()" id="theme-btn" class="dark-btn">🌙</button>
+
+    <h1>👨‍🏫 Teacher Timetable</h1>
+    <h2>Welcome, {{ teacher }}</h2>
+
+    <br>
+
+    <!-- 🔍 Search -->
+    <input type="text" id="search" placeholder="🔍 Search subject, class..." onkeyup="searchTable()">
+
+    <br><br>
+
+    {% if timetable %}
+
+    <div class="table-container">
+    <table class="timetable">
+        <tr>
+            <th onclick="sortTable(0)">Day ⬍</th>
+            <th onclick="sortTable(1)">Period ⬍</th>
+            <th>Subject</th>
+            <th>Class</th>
+            <th>Status</th>
+        </tr>
+
+        {% for row in timetable %}
+        <tr>
+            <td><span class="day-badge">{{ row[0] }}</span></td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+
+            <td>
+                {% if row[4] == teacher %}
+                    <span class="badge substitute-badge">🔁 Substitute</span>
+                {% else %}
+                    <span class="badge regular-badge">📘 Regular</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+
+    {% else %}
+        <h3 class="no-data">📭 No timetable assigned yet</h3>
+    {% endif %}
+
+    <br><br>
+
+    <a href="/logout" class="logout-btn">🔐 Logout</a>
+
+</div>
+
+</body>
+</html>

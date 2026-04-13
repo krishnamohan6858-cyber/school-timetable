@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify OTP</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/login">Teacher</a>
+        <a href="/admin-login">Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h1>🔑 Verify OTP</h1>
+
+    <div class="form-card">
+
+        <form action="/verify-otp" method="POST">
+
+            <!-- Hidden username -->
+            <input type="hidden" name="username" value="{{ username }}">
+
+            <label>Enter OTP</label>
+            <input type="text" name="otp" placeholder="Enter OTP" required>
+
+            <label>New Password</label>
+            <input type="password" name="new_password" placeholder="Enter new password" required>
+
+            <br>
+
+            <button type="submit" class="btn">Reset Password</button>
+
+        </form>
+
+    </div>
+
+    <br>
+
+    <a href="/admin-login" class="back-btn">⬅ Back to Login</a>
+
+</div>
+
+</body>
+</html>

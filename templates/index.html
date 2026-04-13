@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>School Timetable</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/login">Teacher</a>
+        <a href="/admin-login">Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h1>📘 OISM Timetable System</h1>
+
+    <!-- Add Entry -->
+    <div class="form-card">
+
+        <h2>Add Entry</h2>
+
+        <form action="/add" method="POST">
+
+            <label>Class</label>
+            <input type="text" name="class" placeholder="Enter class" required>
+
+            <label>Day</label>
+            <select name="day" required>
+                <option value="">Select Day</option>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+            </select>
+
+            <label>Period</label>
+            <select name="period" required>
+                <option value="">Select Period</option>
+                {% for i in range(1,11) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Subject</label>
+            <input type="text" name="subject" placeholder="Enter subject" required>
+
+            <label>Teacher</label>
+            <select name="teacher" required>
+                <option value="">Select Teacher</option>
+                {% for t in teachers %}
+                    <option value="{{ t }}">{{ t }}</option>
+                {% endfor %}
+            </select>
+
+            <br>
+
+            <button type="submit" class="btn">Add Entry</button>
+
+        </form>
+
+    </div>
+
+    <br>
+
+    <!-- Mark Absent -->
+    <div class="form-card">
+
+        <h2>Mark Teacher Absent</h2>
+
+        <form action="/absent" method="POST">
+
+            <label>Teacher</label>
+            <input type="text" name="teacher" placeholder="Enter teacher name" required>
+
+            <label>Day</label>
+            <select name="day" required>
+                <option value="">Select Day</option>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+            </select>
+
+            <label>Period</label>
+            <select name="period" required>
+                <option value="">Select Period</option>
+                {% for i in range(1,11) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+
+            <br>
+
+            <button type="submit" class="btn">Find Substitute</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

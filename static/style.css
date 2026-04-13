@@ -1,0 +1,301 @@
+/* ===== GLOBAL ===== */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Container */
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+    padding-top: 80px;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #2c3e50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    z-index: 1000;
+}
+
+.logo {
+    color: white;
+    margin: 0;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #4CAF50;
+}
+
+/* ===== HEADINGS ===== */
+h1 {
+    color: #2c3e50;
+}
+
+h2 {
+    color: #555;
+}
+
+/* ===== DARK MODE BUTTON ===== */
+.dark-btn {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 50%;
+    background: #333;
+    color: white;
+    cursor: pointer;
+}
+
+/* ===== SEARCH ===== */
+#search {
+    width: 60%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+}
+
+#search:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76,175,80,0.3);
+}
+
+/* ===== TABLE ===== */
+.table-container {
+    overflow-x: auto;
+}
+
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.timetable th {
+    background: linear-gradient(45deg, #4CAF50, #43a047);
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.timetable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.timetable tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.timetable tr:hover {
+    background: #f1f8f4;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.regular-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.substitute-badge {
+    background: #fff3e0;
+    color: #ef6c00;
+    font-weight: bold;
+}
+
+.day-badge {
+    background: #e3f2fd;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 10px;
+    background: linear-gradient(45deg, #4CAF50, #43a047);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #388e3c;
+}
+
+/* Action buttons */
+.action-btn {
+    padding: 5px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin: 2px;
+}
+
+.action-btn.edit {
+    background: #2196F3;
+    color: white;
+}
+
+.action-btn.delete {
+    background: #f44336;
+    color: white;
+}
+
+/* ===== CARDS ===== */
+.login-card, .form-card {
+    width: 350px;
+    margin: auto;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* Dashboard cards */
+.dashboard {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 200px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+}
+
+.action-card.logout {
+    background: #f44336;
+    color: white;
+}
+
+/* ===== FORM ===== */
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* ===== LINKS ===== */
+.back-btn, .logout-btn {
+    padding: 10px 15px;
+    background: #2c3e50;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.back-btn:hover, .logout-btn:hover {
+    background: #1a252f;
+}
+
+.error {
+    color: red;
+}
+
+/* ===== DARK MODE (FIXED PROPERLY) ===== */
+.dark-mode {
+    background: #121212;
+    color: #e0e0e0;
+}
+
+/* Navbar */
+.dark-mode .navbar {
+    background: #1e1e1e;
+}
+
+/* Table */
+.dark-mode .timetable {
+    background: #1e1e1e;
+}
+
+.dark-mode .timetable th {
+    background: #2e7d32;
+}
+
+.dark-mode .timetable tr:nth-child(even) {
+    background: #2a2a2a;
+}
+
+.dark-mode .timetable td {
+    color: #e0e0e0;
+    border-bottom: 1px solid #333;
+}
+
+/* Cards */
+.dark-mode .login-card,
+.dark-mode .form-card,
+.dark-mode .action-card {
+    background: #1e1e1e;
+    color: white;
+}
+
+/* Inputs */
+.dark-mode input,
+.dark-mode select {
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #555;
+}
+
+/* Buttons */
+.dark-mode .btn {
+    background: #2e7d32;
+}
+
+/* Links */
+.dark-mode a {
+    color: #90caf9;
+}
+
+/* Badges */
+.dark-mode .regular-badge {
+    background: #1b5e20;
+    color: #a5d6a7;
+}
+
+.dark-mode .substitute-badge {
+    background: #e65100;
+    color: #ffe0b2;
+}

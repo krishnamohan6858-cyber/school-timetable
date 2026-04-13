@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/login">Teacher</a>
+        <a href="/admin-login">Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h1>⚙️ Admin Dashboard</h1>
+
+    <!-- 🔷 ACTION CARDS -->
+    <div class="dashboard">
+
+        <a href="/" class="card action-card">➕ Add Timetable</a>
+        <a href="/timetable" class="card action-card">📅 View Timetable</a>
+        <a href="/change-admin-password" class="card action-card">🔑 Change Password</a>
+        <a href="/logout" class="card action-card logout">🚪 Logout</a>
+
+    </div>
+
+    <br>
+
+    <!-- ➕ ADD TEACHER -->
+    <div class="form-card">
+
+        <h2>➕ Add Teacher</h2>
+
+        <form action="/add_teacher" method="POST">
+            <label>Teacher Name</label>
+            <input type="text" name="name" placeholder="Enter teacher name" required>
+
+            <br>
+
+            <button type="submit" class="btn">Add Teacher</button>
+        </form>
+
+    </div>
+
+    <br>
+
+    <!-- 📊 CHART -->
+    <div class="form-card">
+
+        <h2>📊 Teacher Workload</h2>
+
+        <canvas id="chart"></canvas>
+
+    </div>
+
+</div>
+
+<!-- Chart Script -->
+<script>
+fetch('/workload-data')
+.then(res => res.json())
+.then(data => {
+    new Chart(document.getElementById('chart'), {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Classes per Teacher',
+                data: data.values
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#333'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#333' }
+                },
+                y: {
+                    ticks: { color: '#333' }
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>

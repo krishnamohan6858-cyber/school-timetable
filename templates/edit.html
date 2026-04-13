@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Entry</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/login">Teacher</a>
+        <a href="/admin-login">Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h1>✏️ Edit Timetable Entry</h1>
+
+    <div class="form-card">
+
+        <form action="/update/{{ row[0] }}" method="POST">
+
+            <!-- Class -->
+            <label>Class</label>
+            <input type="text" name="class" value="{{ row[1] }}" required>
+
+            <!-- Day -->
+            <label>Day</label>
+            <select name="day" required>
+                <option disabled>Select Day</option>
+                <option value="Monday" {{ 'selected' if row[2]=='Monday' }}>Monday</option>
+                <option value="Tuesday" {{ 'selected' if row[2]=='Tuesday' }}>Tuesday</option>
+                <option value="Wednesday" {{ 'selected' if row[2]=='Wednesday' }}>Wednesday</option>
+                <option value="Thursday" {{ 'selected' if row[2]=='Thursday' }}>Thursday</option>
+                <option value="Friday" {{ 'selected' if row[2]=='Friday' }}>Friday</option>
+            </select>
+
+            <!-- Period -->
+            <label>Period</label>
+            <select name="period" required>
+                {% for i in range(1,11) %}
+                    <option value="{{ i }}" {{ 'selected' if row[3]==i }}>{{ i }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Subject -->
+            <label>Subject</label>
+            <input type="text" name="subject" value="{{ row[4] }}" required>
+
+            <!-- Teacher -->
+            <label>Teacher</label>
+            <input type="text" name="teacher" value="{{ row[5] }}" required>
+
+            <br>
+
+            <button type="submit" class="btn">Update</button>
+
+        </form>
+
+    </div>
+
+    <br>
+
+    <a href="/timetable" class="back-btn">⬅ Back</a>
+
+</div>
+
+</body>
+</html>

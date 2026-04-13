@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Show/Hide Password Script -->
+    <script>
+    function togglePassword() {
+        let pwd = document.getElementById("password");
+        if (pwd.type === "password") {
+            pwd.type = "text";
+        } else {
+            pwd.type = "password";
+        }
+    }
+    </script>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/login">Teacher</a>
+        <a href="/admin-login">Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h1>🔐 Admin Login</h1>
+
+    <div class="login-card">
+
+        <form method="POST">
+
+            <!-- Username -->
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter username" required>
+
+            <!-- Password -->
+            <label>Password</label>
+            <div style="position: relative;">
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+                <span onclick="togglePassword()" style="
+                    position:absolute;
+                    right:10px;
+                    top:50%;
+                    transform:translateY(-50%);
+                    cursor:pointer;
+                ">👁️</span>
+            </div>
+
+            <br>
+
+            <button type="submit" class="btn">Login</button>
+
+        </form>
+
+        <!-- Forgot Password -->
+        <a href="/forgot-password" class="forgot-link">❓ Forgot Password?</a>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+    </div>
+
+    <br>
+
+    <a href="/" class="back-btn">⬅ Go Back</a>
+
+</div>
+
+</body>
+</html>

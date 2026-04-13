@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Login</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <script>
+    // 🌙 Dark Mode
+    function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+
+        const btn = document.getElementById("theme-btn");
+
+        if (document.body.classList.contains("dark-mode")) {
+            localStorage.setItem("theme", "dark");
+            btn.innerText = "☀️";
+        } else {
+            localStorage.setItem("theme", "light");
+            btn.innerText = "🌙";
+        }
+    }
+
+    // Load saved theme
+    window.onload = function () {
+        const btn = document.getElementById("theme-btn");
+
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-mode");
+            btn.innerText = "☀️";
+        }
+    };
+    </script>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/login">Teacher</a>
+        <a href="/admin-login">Admin</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Dark Mode Button -->
+    <button onclick="toggleDarkMode()" id="theme-btn" class="dark-btn">🌙</button>
+
+    <h1>👨‍🏫 Teacher Login</h1>
+
+    <div class="login-card">
+
+        <form method="POST">
+
+            <!-- Teacher Dropdown -->
+            <label>Select Teacher</label>
+            <select name="teacher" required autofocus>
+                <option value="">-- Choose Teacher --</option>
+                {% for t in teachers %}
+                    <option value="{{ t }}">{{ t }}</option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+
+            <button type="submit" class="btn">Login</button>
+
+        </form>
+
+        {% if error %}
+            <p class="error">❌ {{ error }}</p>
+        {% endif %}
+
+    </div>
+
+    <br>
+
+    <a href="/" class="back-btn">⬅ Go Back</a>
+
+</div>
+
+</body>
+</html>
