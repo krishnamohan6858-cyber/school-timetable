@@ -439,5 +439,20 @@ def update(id):
     flash("Updated successfully!", "success")
     return redirect('/timetable')
 
+#----------delete entries----------#
+@app.route('/delete/<int:id>')
+def delete(id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM timetable WHERE id=%s", (id,))
+
+    conn.commit()
+    conn.close()
+
+    flash("Entry deleted successfully!", "success")
+    return redirect('/timetable')
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
