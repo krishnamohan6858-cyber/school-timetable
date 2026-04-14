@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>School Timetable</title>
-
-    <!-- CSS -->
+    <title>Dashboard - OISM Timetable</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-<!-- Navbar -->
-<div class="navbar">
-    <h2 class="logo">📘 OISM Timetable</h2>
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>📘 OISM Timetable</h2>
 
-    <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/timetable">Timetable</a>
-        <a href="/login">Teacher</a>
-        <a href="/admin-login">Admin</a>
-    </div>
+    <a href="/">🏠 Dashboard</a>
+    <a href="/timetable">📅 Timetable</a>
+    <a href="/login">👨‍🏫 Teacher</a>
+    <a href="/admin-login">🔐 Admin</a>
 </div>
 
-<div class="container">
+<!-- MAIN CONTENT -->
+<div class="main">
 
-    <h1>📘 OISM Timetable System</h1>
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <h1>📊 Dashboard</h1>
+    </div>
 
-    <!-- 🔔 FLASH MESSAGES -->
+    <!-- FLASH MESSAGES -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -34,19 +34,28 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Add Entry -->
-    <div class="form-card">
+    <!-- CARDS -->
+    <div class="grid">
 
-        <h2>Add Entry</h2>
+        <!-- ADD ENTRY -->
+        <div class="card">
+            <h3>➕ Add Timetable</h3>
+            <form action="/add" method="POST">
 
-        <form action="/add" method="POST">
+            <!-- CLASS DROPDOWN -->
+            <select name="class" required>
+                <option value="">Select Class</option>
+                <option>10A</option>
+                <option>10B</option>
+                <option>10C</option>
+                <option>9A</option>
+                <option>9B</option>
+                <option>9C</option>
+            </select>
 
-            <label>Class</label>
-            <input type="text" name="class" placeholder="Enter class (e.g. 10-A)" required>
-
-            <label>Day</label>
+            <!-- DAY -->
             <select name="day" required>
-                <option value="">Select Day</option>
+                <option value="">Day</option>
                 <option>Monday</option>
                 <option>Tuesday</option>
                 <option>Wednesday</option>
@@ -54,68 +63,78 @@
                 <option>Friday</option>
             </select>
 
-            <label>Period</label>
+            <!-- PERIOD -->
             <select name="period" required>
-                <option value="">Select Period</option>
+                <option value="">Period</option>
                 {% for i in range(1,11) %}
                     <option value="{{ i }}">{{ i }}</option>
                 {% endfor %}
             </select>
 
-            <label>Subject</label>
-            <input type="text" name="subject" placeholder="Enter subject" required>
+            <!-- SUBJECT DROPDOWN -->
+            <select name="subject" required>
+                <option value="">Select Subject</option>
+                <option>Mathematics</option>
+                <option>Physics</option>
+                <option>Chemistry</option>
+                <option>Biology</option>
+                <option>English</option>
+                <option>Hindi</option>
+                <option>SST</option>
+            </select>
 
-            <label>Teacher</label>
+            <!-- TEACHER -->
             <select name="teacher" required>
-                <option value="">Select Teacher</option>
+                <option value="">Teacher</option>
                 {% for t in teachers %}
                     <option value="{{ t }}">{{ t }}</option>
                 {% endfor %}
             </select>
 
-            <br>
-
-            <button type="submit" class="btn">➕ Add Entry</button>
+            <button class="btn">➕ Add Entry</button>
 
         </form>
+        </div>
 
-    </div>
+        <!-- SUBSTITUTE -->
+        <div class="card">
+            <h3>🔁 Substitute</h3>
 
-    <br>
+            <form action="/absent" method="POST">
 
-    <!-- Mark Absent -->
-    <div class="form-card">
+                <!-- TEACHER DROPDOWN -->
+                <label>Select Teacher</label>
+                <select name="teacher" required>
+                    <option value="">Choose Teacher</option>
+                    {% for t in teachers %}
+                        <option value="{{ t }}">{{ t }}</option>
+                    {% endfor %}
+                </select>
 
-        <h2>Mark Teacher Absent</h2>
+                <!-- DAY -->
+                <label>Day</label>
+                <select name="day" required>
+                    <option value="">Select Day</option>
+                    <option>Monday</option>
+                    <option>Tuesday</option>
+                    <option>Wednesday</option>
+                    <option>Thursday</option>
+                    <option>Friday</option>
+                </select>
 
-        <form action="/absent" method="POST">
+                <!-- PERIOD -->
+                <label>Period</label>
+                <select name="period" required>
+                    <option value="">Select Period</option>
+                    {% for i in range(1,11) %}
+                        <option value="{{ i }}">{{ i }}</option>
+                    {% endfor %}
+                </select>
 
-            <label>Teacher</label>
-            <input type="text" name="teacher" placeholder="Enter teacher name" required>
+                <button class="btn">🔁 Find Substitute</button>
 
-            <label>Day</label>
-            <select name="day" required>
-                <option value="">Select Day</option>
-                <option>Monday</option>
-                <option>Tuesday</option>
-                <option>Wednesday</option>
-                <option>Thursday</option>
-                <option>Friday</option>
-            </select>
-
-            <label>Period</label>
-            <select name="period" required>
-                <option value="">Select Period</option>
-                {% for i in range(1,11) %}
-                    <option value="{{ i }}">{{ i }}</option>
-                {% endfor %}
-            </select>
-
-            <br>
-
-            <button type="submit" class="btn">🔁 Find Substitute</button>
-
-        </form>
+            </form>
+        </div>
 
     </div>
 

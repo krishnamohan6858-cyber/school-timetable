@@ -26,8 +26,24 @@ app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret")
 #         )
 
 
+# def get_db_connection():
+#     return psycopg2.connect(os.environ.get("DATABASE_URL"))
+
+
 def get_db_connection():
-    return psycopg2.connect(os.environ.get("DATABASE_URL"))
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+
+    if DATABASE_URL:
+        # For Render (production)
+        return psycopg2.connect(DATABASE_URL)
+    else:
+        # For Local (your PC)
+        return psycopg2.connect(
+            host="localhost",
+            database="school_timetable",
+            user="postgres",
+            password="Triplet@5714"  # 👈 put your real password
+        )
 
 # ---------------- EMAIL ----------------
 
@@ -163,33 +179,6 @@ def timetable():
     return render_template('timetable.html', data=data)
 
 
-# @app.route('/add', methods=['POST'])
-# def add():
-#     class_name = request.form['class'].strip()
-#     if not class_name:
-#         flash("Invalid input", "error")
-#         return redirect('/')
-
-#     conn = get_db_connection()
-#     cur = conn.cursor()
-
-#     cur.execute("""
-#     INSERT INTO timetable (class, day, period, subject, teacher, substitute)
-#     VALUES (%s, %s, %s, %s, %s, %s)
-#     """, (
-#         class_name,
-#         request.form['day'],
-#         request.form['period'],
-#         request.form['subject'],
-#         request.form['teacher'],
-#         ""
-#     ))
-
-#     conn.commit()
-#     conn.close()
-
-#     flash("Entry added successfully!", "success")
-#     return redirect('/')
 
 @app.route('/add', methods=['POST'])
 def add():
@@ -323,9 +312,24 @@ def admin_login():
         cur.execute("SELECT password FROM admin WHERE username=%s", (username,))
         data = cur.fetchone()
 
-        if data and bcrypt.checkpw(password.encode(), data[0].encode()):
-            session['admin'] = username
-            return redirect('/admin-dashboard')
+        if data:
+            stored_password = data[0]
+
+            # ✅ HANDLE BOTH CASES (OLD + NEW)
+            if stored_password.startswith("$2b$"):
+                # 🔒 Hashed password
+                if bcrypt.checkpw(password.encode(), stored_password.encode()):
+                    session['admin'] = username
+                    return redirect('/admin-dashboard')
+                else:
+                    error = "Invalid credentials"
+            else:
+                # ⚠️ Plain password (old DB)
+                if password == stored_password:
+                    session['admin'] = username
+                    return redirect('/admin-dashboard')
+                else:
+                    error = "Invalid credentials"
         else:
             error = "Invalid credentials"
 
