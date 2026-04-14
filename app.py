@@ -163,32 +163,77 @@ def timetable():
     return render_template('timetable.html', data=data)
 
 
+# @app.route('/add', methods=['POST'])
+# def add():
+#     class_name = request.form['class'].strip()
+#     if not class_name:
+#         flash("Invalid input", "error")
+#         return redirect('/')
+
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("""
+#     INSERT INTO timetable (class, day, period, subject, teacher, substitute)
+#     VALUES (%s, %s, %s, %s, %s, %s)
+#     """, (
+#         class_name,
+#         request.form['day'],
+#         request.form['period'],
+#         request.form['subject'],
+#         request.form['teacher'],
+#         ""
+#     ))
+
+#     conn.commit()
+#     conn.close()
+
+#     flash("Entry added successfully!", "success")
+#     return redirect('/')
+
 @app.route('/add', methods=['POST'])
 def add():
     class_name = request.form['class'].strip()
-    if not class_name:
-        flash("Invalid input", "error")
-        return redirect('/')
+    day = request.form['day']
+    period = request.form['period']
+    subject = request.form['subject']
+    teacher = request.form['teacher']
 
     conn = get_db_connection()
     cur = conn.cursor()
 
+    # ❌ Check 1: Class already assigned
+    cur.execute("""
+    SELECT * FROM timetable
+    WHERE class=%s AND day=%s AND period=%s
+    """, (class_name, day, period))
+
+    if cur.fetchone():
+        conn.close()
+        flash("⚠️ This class already has a subject assigned in this period!", "error")
+        return redirect('/')
+
+    # ❌ Check 2: Teacher already busy
+    cur.execute("""
+    SELECT * FROM timetable
+    WHERE teacher=%s AND day=%s AND period=%s
+    """, (teacher, day, period))
+
+    if cur.fetchone():
+        conn.close()
+        flash("⚠️ This teacher already has a class in this period!", "error")
+        return redirect('/')
+
+    # ✅ Insert if valid
     cur.execute("""
     INSERT INTO timetable (class, day, period, subject, teacher, substitute)
     VALUES (%s, %s, %s, %s, %s, %s)
-    """, (
-        class_name,
-        request.form['day'],
-        request.form['period'],
-        request.form['subject'],
-        request.form['teacher'],
-        ""
-    ))
+    """, (class_name, day, period, subject, teacher, ""))
 
     conn.commit()
     conn.close()
 
-    flash("Entry added successfully!", "success")
+    flash("✅ Entry added successfully!", "success")
     return redirect('/')
 
 

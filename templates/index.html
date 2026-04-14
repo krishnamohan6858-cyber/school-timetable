@@ -25,6 +25,15 @@
 
     <h1>📘 OISM Timetable System</h1>
 
+    <!-- 🔔 FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <!-- Add Entry -->
     <div class="form-card">
 
@@ -33,7 +42,7 @@
         <form action="/add" method="POST">
 
             <label>Class</label>
-            <input type="text" name="class" placeholder="Enter class" required>
+            <input type="text" name="class" placeholder="Enter class (e.g. 10-A)" required>
 
             <label>Day</label>
             <select name="day" required>
@@ -66,7 +75,7 @@
 
             <br>
 
-            <button type="submit" class="btn">Add Entry</button>
+            <button type="submit" class="btn">➕ Add Entry</button>
 
         </form>
 
@@ -104,7 +113,7 @@
 
             <br>
 
-            <button type="submit" class="btn">Find Substitute</button>
+            <button type="submit" class="btn">🔁 Find Substitute</button>
 
         </form>
 

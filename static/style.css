@@ -299,3 +299,22 @@ input, select {
     background: #e65100;
     color: #ffe0b2;
 }
+
+/* Flash Messages */
+.flash {
+    padding: 10px;
+    margin: 10px auto;
+    width: 60%;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.flash.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.flash.error {
+    background: #ffebee;
+    color: #c62828;
+}
