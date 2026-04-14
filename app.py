@@ -291,7 +291,8 @@ def admin_login():
 @app.route('/admin-dashboard')
 def admin_dashboard():
     if 'admin' not in session:
-        return redirect('/admin-login')
+        # return redirect('/admin-login')
+        return redirect(url_for('admin_dashboard'))
     return render_template('admin_dashboard.html')
 
 
