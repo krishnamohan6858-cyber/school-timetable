@@ -28,6 +28,15 @@
 
     <h1>⚙️ Admin Dashboard</h1>
 
+    <!-- ✅ FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <p class="{{ category }}">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <!-- 🔷 ACTION CARDS -->
     <div class="dashboard">
 
@@ -45,18 +54,12 @@
 
         <h2>➕ Add Teacher</h2>
 
-        <!-- <form action="/add_teacher" method="POST">
+        <form action="/add_teacher" method="POST">
             <label>Teacher Name</label>
             <input type="text" name="name" placeholder="Enter teacher name" required>
 
-            <br>
-
             <button type="submit" class="btn">Add Teacher</button>
-        </form> -->
-    <form action="/add_teacher" method="POST">
-        <input type="text" name="name" placeholder="Teacher Name" required>
-        <button type="submit" class="btn">Add</button>
-    </form>
+        </form>
 
     </div>
 
@@ -78,6 +81,9 @@
 fetch('/workload-data')
 .then(res => res.json())
 .then(data => {
+
+    const isDark = document.body.classList.contains("dark-mode");
+
     new Chart(document.getElementById('chart'), {
         type: 'bar',
         data: {
@@ -92,16 +98,16 @@ fetch('/workload-data')
             plugins: {
                 legend: {
                     labels: {
-                        color: '#333'
+                        color: isDark ? '#fff' : '#333'
                     }
                 }
             },
             scales: {
                 x: {
-                    ticks: { color: '#333' }
+                    ticks: { color: isDark ? '#fff' : '#333' }
                 },
                 y: {
-                    ticks: { color: '#333' }
+                    ticks: { color: isDark ? '#fff' : '#333' }
                 }
             }
         }

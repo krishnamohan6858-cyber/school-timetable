@@ -287,12 +287,36 @@ def admin_login():
     conn.close()
     return render_template('admin_login.html', error=error)
 
+@app.route('/add_teacher', methods=['POST'])
+def add_teacher():
+    if 'admin' not in session:
+        return redirect('/admin-login')
+
+    name = request.form['name'].strip()
+
+    if not name:
+        flash("Teacher name cannot be empty", "error")
+        return redirect('/admin-dashboard')
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    try:
+        cur.execute("INSERT INTO teachers (name) VALUES (%s)", (name,))
+        conn.commit()
+        flash("✅ Teacher added successfully!", "success")
+    except:
+        flash("⚠️ Teacher already exists!", "error")
+
+    conn.close()
+    return redirect('/admin-dashboard')
+
 
 @app.route('/admin-dashboard')
 def admin_dashboard():
     if 'admin' not in session:
         # return redirect('/admin-login')
-        return redirect(url_for('admin_dashboard'))
+        return redirect('/admin-login')
     return render_template('admin_dashboard.html')
 
 
@@ -359,5 +383,23 @@ def verify_otp():
             return "Password Reset Successful"
 
     return "Invalid OTP"
+
+#--------------Work-load--------#
+
+@app.route('/workload-data')
+def workload_data():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT teacher, COUNT(*) FROM timetable GROUP BY teacher")
+    data = cur.fetchall()
+
+    conn.close()
+
+    labels = [row[0] for row in data]
+    values = [row[1] for row in data]
+
+    return {"labels": labels, "values": values}
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
