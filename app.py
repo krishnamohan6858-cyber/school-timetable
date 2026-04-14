@@ -401,5 +401,43 @@ def workload_data():
 
     return {"labels": labels, "values": values}
 
+
+#-------------edit----------------#
+@app.route('/edit/<int:id>')
+def edit(id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM timetable WHERE id=%s", (id,))
+    row = cur.fetchone()
+
+    conn.close()
+    return render_template('edit.html', row=row)
+
+
+@app.route('/update/<int:id>', methods=['POST'])
+def update(id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    UPDATE timetable
+    SET class=%s, day=%s, period=%s, subject=%s, teacher=%s
+    WHERE id=%s
+    """, (
+        request.form['class'],
+        request.form['day'],
+        request.form['period'],
+        request.form['subject'],
+        request.form['teacher'],
+        id
+    ))
+
+    conn.commit()
+    conn.close()
+
+    flash("Updated successfully!", "success")
+    return redirect('/timetable')
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
