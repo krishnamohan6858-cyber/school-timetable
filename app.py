@@ -12,23 +12,6 @@ app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret")
 
 # ---------------- DATABASE ----------------
 
-# def get_db_connection():
-#     DATABASE_URL = os.environ.get("DATABASE_URL")
-
-#     if DATABASE_URL:
-#         return psycopg2.connect(DATABASE_URL)
-#     else:
-#         return psycopg2.connect(
-#             host="localhost",
-#             database="school_timetable",
-#             user="postgres",
-#             password="Triplet@5714"  # 👈 put your pgAdmin password
-#         )
-
-
-# def get_db_connection():
-#     return psycopg2.connect(os.environ.get("DATABASE_URL"))
-
 
 def get_db_connection():
     DATABASE_URL = os.environ.get("DATABASE_URL")
@@ -127,33 +110,61 @@ def get_teacher_load(day):
     conn.close()
     return dict(data)
 
-
-def get_substitute(day, period):
+def get_daily_load(day):
     conn = get_db_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT DISTINCT teacher FROM timetable")
-    all_teachers = [t[0] for t in cur.fetchall()]
+    cur.execute("""
+    SELECT teacher, COUNT(*) FROM timetable
+    WHERE day=%s GROUP BY teacher
+    """, (day,))
 
-    cur.execute("SELECT teacher FROM timetable WHERE day=%s AND period=%s", (day, period))
-    busy = [t[0] for t in cur.fetchall()]
-
-    free = [t for t in all_teachers if t not in busy]
-    loads = get_teacher_load(day)
-
-    best = None
-    min_load = 999
-
-    for t in free:
-        load = loads.get(t, 0)
-        if load < 5 and load < min_load:
-            best = t
-            min_load = load
-
+    data = cur.fetchall()
     conn.close()
-    return best if best else "No substitute available"
+    return dict(data)
 
-# ---------------- ROUTES ----------------
+
+def get_weekly_load():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT teacher, COUNT(*) FROM timetable
+    GROUP BY teacher
+    """)
+
+    data = cur.fetchall()
+    conn.close()
+    return dict(data)
+
+
+def get_substitution_count(day):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT substitute, COUNT(*) FROM timetable
+    WHERE day=%s AND substitute IS NOT NULL AND substitute != ''
+    GROUP BY substitute
+    """, (day,))
+
+    data = cur.fetchall()
+    conn.close()
+    return dict(data)
+
+
+def get_busy_teachers(day, period):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT teacher FROM timetable
+    WHERE day=%s AND period=%s
+    """, (day, period))
+
+    busy = [t[0] for t in cur.fetchall()]
+    conn.close()
+    return busy
 
 @app.route('/')
 def home():
@@ -166,6 +177,75 @@ def home():
     conn.close()
     return render_template('index.html', teachers=teachers)
 
+
+def get_substitute(day, period):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Get all teachers
+    cur.execute("SELECT name FROM teachers")
+    all_teachers = [t[0] for t in cur.fetchall()]
+    conn.close()
+
+    busy_teachers = get_busy_teachers(day, period)
+    daily_load = get_daily_load(day)
+    weekly_load = get_weekly_load()
+    subs_count = get_substitution_count(day)
+
+    # Step 1: Only free teachers
+    free_teachers = [t for t in all_teachers if t not in busy_teachers]
+
+    # Step 2: Remove overloaded teachers (>40 weekly)
+    free_teachers = [t for t in free_teachers if weekly_load.get(t, 0) <= 40]
+
+    def pick_teacher(max_periods, max_subs):
+        candidates = []
+
+        for t in free_teachers:
+            day_load = daily_load.get(t, 0)
+            subs = subs_count.get(t, 0)
+            total = weekly_load.get(t, 0)
+
+            if day_load <= max_periods and subs < max_subs:
+                candidates.append((t, total))
+
+        # Sort by least workload
+        candidates.sort(key=lambda x: x[1])
+
+        return candidates[0][0] if candidates else None
+
+    # ---------------- PRIORITY SYSTEM ---------------- #
+
+    # 🥇 PRIORITY 1
+    # Teachers with <=6 periods, no substitution yet
+    teacher = pick_teacher(max_periods=6, max_subs=1)
+    if teacher:
+        return teacher
+
+    # 🥈 PRIORITY 2
+    # Teachers with <=7 periods, max 1 substitution
+    teacher = pick_teacher(max_periods=7, max_subs=1)
+    if teacher:
+        return teacher
+
+    # 🥉 PRIORITY 3
+    # Teachers with <=6 periods, allow second substitution
+    teacher = pick_teacher(max_periods=6, max_subs=2)
+    if teacher:
+        return teacher
+
+    # 🟡 PRIORITY 4 (LAST OPTION)
+    # Teachers with <=8 periods, max 2 substitutions
+    teacher = pick_teacher(max_periods=8, max_subs=1)
+    if teacher:
+        return teacher
+
+    return "No substitute available"
+
+
+
+
+# # ---------------- ROUTES ----------------
 
 @app.route('/timetable')
 def timetable():
