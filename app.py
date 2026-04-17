@@ -360,37 +360,78 @@ def login():
     return render_template('login.html', teachers=teachers, error=error)
 
 
+# @app.route('/dashboard')
+# def dashboard():
+#     if 'teacher' not in session:
+#         return redirect('/login')
+
+#     name = session['teacher']
+#     selected_day = request.args.get('day')
+
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     if selected_day:
+#         cur.execute("""
+#         SELECT day, period, subject, class, substitute
+#         FROM timetable
+#         WHERE (teacher=%s OR substitute=%s) AND day=%s
+#         """, (name, name, selected_day))
+#     else:
+#         cur.execute("""
+#         SELECT day, period, subject, class, substitute
+#         FROM timetable
+#         WHERE teacher=%s OR substitute=%s
+#         """, (name, name))
+
+#     timetable = cur.fetchall()
+#     conn.close()
+
+#     return render_template('teacher.html',
+#                            timetable=timetable,
+#                            teacher=name,
+#                            selected_day=selected_day)
+
 @app.route('/dashboard')
 def dashboard():
     if 'teacher' not in session:
         return redirect('/login')
 
     name = session['teacher']
-    selected_day = request.args.get('day')
 
     conn = get_db_connection()
     cur = conn.cursor()
 
-    if selected_day:
-        cur.execute("""
-        SELECT day, period, subject, class, substitute
-        FROM timetable
-        WHERE (teacher=%s OR substitute=%s) AND day=%s
-        """, (name, name, selected_day))
-    else:
-        cur.execute("""
-        SELECT day, period, subject, class, substitute
-        FROM timetable
-        WHERE teacher=%s OR substitute=%s
-        """, (name, name))
+    cur.execute("""
+    SELECT day, period, subject, class, substitute
+    FROM timetable
+    WHERE teacher=%s OR substitute=%s
+    """, (name, name))
 
-    timetable = cur.fetchall()
+    rows = cur.fetchall()
     conn.close()
 
+    # 🧠 Convert into GRID format
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    periods = list(range(1, 11))
+
+    grid = {p: {d: None for d in days} for p in periods}
+
+    for row in rows:
+        day, period, subject, cls, sub = row
+        grid[period][day] = {
+            "subject": subject,
+            "class": cls,
+            "substitute": sub
+        }
+
     return render_template('teacher.html',
-                           timetable=timetable,
                            teacher=name,
-                           selected_day=selected_day)
+                           grid=grid,
+                           days=days,
+                           periods=periods)
+
+
 
 # ---------------- ADMIN ----------------
 

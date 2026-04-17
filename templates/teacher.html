@@ -1,157 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Teacher Timetable</title>
-
-    <!-- CSS -->
+    <title>Teacher Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- Scripts -->
-    <script>
-    let sortDirection = true;
-
-    function sortTable(col) {
-        let table = document.querySelector(".timetable");
-        let rows = Array.from(table.rows).slice(1);
-
-        let isNumeric = col === 1;
-
-        rows.sort((a, b) => {
-            let valA = a.cells[col].innerText;
-            let valB = b.cells[col].innerText;
-
-            return sortDirection
-                ? (isNumeric ? valA - valB : valA.localeCompare(valB))
-                : (isNumeric ? valB - valA : valB.localeCompare(valA));
-        });
-
-        sortDirection = !sortDirection;
-        rows.forEach(row => table.appendChild(row));
+    <style>
+    .grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
     }
 
-    function searchTable() {
-        let input = document.getElementById("search").value.toLowerCase();
-        let rows = document.querySelectorAll(".timetable tr");
-
-        rows.forEach((row, index) => {
-            if (index === 0) return;
-            let text = row.innerText.toLowerCase();
-            row.style.display = text.includes(input) ? "" : "none";
-        });
+    .grid-table th, .grid-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle("dark-mode");
-
-        const btn = document.getElementById("theme-btn");
-
-        if (document.body.classList.contains("dark-mode")) {
-            localStorage.setItem("theme", "dark");
-            btn.innerText = "☀️";
-        } else {
-            localStorage.setItem("theme", "light");
-            btn.innerText = "🌙";
-        }
+    .grid-table th {
+        background: #4CAF50;
+        color: white;
     }
 
-    window.onload = function () {
-        const btn = document.getElementById("theme-btn");
+    .cell {
+        font-size: 13px;
+    }
 
-        if (localStorage.getItem("theme") === "dark") {
-            document.body.classList.add("dark-mode");
-            btn.innerText = "☀️";
-        }
-    };
-    </script>
+    .regular { background: #e3f2fd; }
+    .substitute { background: #fff3cd; }
+    .covered { background: #f8d7da; }
+    </style>
 </head>
 
 <body>
 
-<!-- Navbar -->
 <div class="navbar">
     <h2 class="logo">📘 OISM Timetable</h2>
-
-    <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/timetable">Timetable</a>
-        <a href="/login">Teacher</a>
-        <a href="/admin-login">Admin</a>
-    </div>
 </div>
 
 <div class="container">
 
-    <!-- Top Controls -->
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-            <h1>👨‍🏫 Teacher Dashboard</h1>
-            <h3>Welcome, {{ teacher }}</h3>
-        </div>
+    <h1>👨‍🏫 {{ teacher }} Dashboard</h1>
 
-        <button onclick="toggleDarkMode()" id="theme-btn" class="dark-btn">🌙</button>
-    </div>
+    <table class="grid-table">
 
-    <br>
-
-    <!-- 🔽 DAY FILTER -->
-    <form method="GET" action="/dashboard" class="filter-bar">
-
-        <select name="day">
-            <option value="">All Days</option>
-            <option {% if selected_day=='Monday' %}selected{% endif %}>Monday</option>
-            <option {% if selected_day=='Tuesday' %}selected{% endif %}>Tuesday</option>
-            <option {% if selected_day=='Wednesday' %}selected{% endif %}>Wednesday</option>
-            <option {% if selected_day=='Thursday' %}selected{% endif %}>Thursday</option>
-            <option {% if selected_day=='Friday' %}selected{% endif %}>Friday</option>
-        </select>
-
-        <button class="btn">Filter</button>
-
-    </form>
-
-    <br>
-
-    <!-- 🔍 SEARCH -->
-    <input type="text" id="search" placeholder="🔍 Search subject, class..." onkeyup="searchTable()">
-
-    <br><br>
-
-    {% if timetable %}
-
-    <div class="table-container">
-    <table class="timetable">
+        <!-- HEADER -->
         <tr>
-            <th onclick="sortTable(0)">Day ⬍</th>
-            <th onclick="sortTable(1)">Period ⬍</th>
-            <th>Subject</th>
-            <th>Class</th>
-            <th>Status</th>
+            <th>Period</th>
+            {% for day in days %}
+                <th>{{ day }}</th>
+            {% endfor %}
         </tr>
 
-        {% for row in timetable %}
+        <!-- ROWS -->
+        {% for p in periods %}
         <tr>
-            <td><span class="day-badge">{{ row[0] }}</span></td>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
+            <td><b>{{ p }}</b></td>
 
-            <td>
-                {% if row[4] == teacher %}
-                    <span class="badge substitute-badge">🔁 Substitute Class</span>
-                {% elif row[4] %}
-                    <span class="badge covered-badge">🟡 Covered by {{ row[4] }}</span>
-                {% else %}
-                    <span class="badge regular-badge">📘 Regular</span>
-                {% endif %}
-            </td>
+            {% for day in days %}
+                {% set cell = grid[p][day] %}
+
+                <td>
+                    {% if cell %}
+
+                        {% if cell.substitute == teacher %}
+                            <div class="cell substitute">
+                                🔁 {{ cell.subject }}<br>
+                                {{ cell.class }}<br>
+                                <small>(Substitute)</small>
+                            </div>
+
+                        {% elif cell.substitute %}
+                            <div class="cell covered">
+                                📘 {{ cell.subject }}<br>
+                                {{ cell.class }}<br>
+                                <small>Covered</small>
+                            </div>
+
+                        {% else %}
+                            <div class="cell regular">
+                                📘 {{ cell.subject }}<br>
+                                {{ cell.class }}
+                            </div>
+                        {% endif %}
+
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+            {% endfor %}
         </tr>
         {% endfor %}
-    </table>
-    </div>
 
-    {% else %}
-        <h3 class="no-data">📭 No timetable assigned</h3>
-    {% endif %}
+    </table>
 
     <br><br>
 
