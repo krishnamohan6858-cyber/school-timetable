@@ -268,3 +268,49 @@ input:focus, select:focus {
 .dark-mode .grid-table th {
     background: #1d4ed8;
 }
+
+/* GRID ACTION BUTTONS FIX */
+.grid-actions {
+    margin-top: 6px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.edit-btn {
+    background: #2196F3;
+    color: white;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.delete-btn {
+    background: #f44336;
+    color: white;
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.edit-btn:hover {
+    background: #1976d2;
+}
+
+.delete-btn:hover {
+    background: #d32f2f;
+}
+.edit-mode input {
+    width: 90%;
+    margin: 2px 0;
+    padding: 4px;
+    font-size: 12px;
+}
+
+.edit-mode button {
+    margin-top: 3px;
+    font-size: 11px;
+    padding: 3px 6px;
+}
