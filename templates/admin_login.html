@@ -10,11 +10,7 @@
     <script>
     function togglePassword() {
         let pwd = document.getElementById("password");
-        if (pwd.type === "password") {
-            pwd.type = "text";
-        } else {
-            pwd.type = "password";
-        }
+        pwd.type = (pwd.type === "password") ? "text" : "password";
     }
     </script>
 </head>
@@ -38,6 +34,15 @@
     <h1>🔐 Admin Login</h1>
 
     <div class="login-card">
+
+        <!-- ✅ FLASH MESSAGES (IMPORTANT) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="message {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <form method="POST">
 
@@ -67,6 +72,7 @@
         <!-- Forgot Password -->
         <a href="/forgot-password" class="forgot-link">❓ Forgot Password?</a>
 
+        <!-- Old error fallback -->
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}

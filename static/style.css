@@ -427,3 +427,13 @@ input, select {
     background: #fee2e2;
     color: #991b1b;
 }
+
+.message.success {
+    color: green;
+    font-weight: bold;
+}
+
+.message.error {
+    color: red;
+    font-weight: bold;
+}

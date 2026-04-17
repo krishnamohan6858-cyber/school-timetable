@@ -10,7 +10,6 @@
     <script>
     let sortDirection = true;
 
-    // 🔃 Sort Table (toggle asc/desc)
     function sortTable(col) {
         let table = document.querySelector(".timetable");
         let rows = Array.from(table.rows).slice(1);
@@ -27,11 +26,9 @@
         });
 
         sortDirection = !sortDirection;
-
         rows.forEach(row => table.appendChild(row));
     }
 
-    // 🔍 Search
     function searchTable() {
         let input = document.getElementById("search").value.toLowerCase();
         let rows = document.querySelectorAll(".timetable tr");
@@ -43,7 +40,6 @@
         });
     }
 
-    // 🌙 Dark Mode
     function toggleDarkMode() {
         document.body.classList.toggle("dark-mode");
 
@@ -85,15 +81,37 @@
 
 <div class="container">
 
-    <!-- Dark Mode Button -->
-    <button onclick="toggleDarkMode()" id="theme-btn" class="dark-btn">🌙</button>
+    <!-- Top Controls -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h1>👨‍🏫 Teacher Dashboard</h1>
+            <h3>Welcome, {{ teacher }}</h3>
+        </div>
 
-    <h1>👨‍🏫 Teacher Timetable</h1>
-    <h2>Welcome, {{ teacher }}</h2>
+        <button onclick="toggleDarkMode()" id="theme-btn" class="dark-btn">🌙</button>
+    </div>
 
     <br>
 
-    <!-- 🔍 Search -->
+    <!-- 🔽 DAY FILTER -->
+    <form method="GET" action="/dashboard" class="filter-bar">
+
+        <select name="day">
+            <option value="">All Days</option>
+            <option {% if selected_day=='Monday' %}selected{% endif %}>Monday</option>
+            <option {% if selected_day=='Tuesday' %}selected{% endif %}>Tuesday</option>
+            <option {% if selected_day=='Wednesday' %}selected{% endif %}>Wednesday</option>
+            <option {% if selected_day=='Thursday' %}selected{% endif %}>Thursday</option>
+            <option {% if selected_day=='Friday' %}selected{% endif %}>Friday</option>
+        </select>
+
+        <button class="btn">Filter</button>
+
+    </form>
+
+    <br>
+
+    <!-- 🔍 SEARCH -->
     <input type="text" id="search" placeholder="🔍 Search subject, class..." onkeyup="searchTable()">
 
     <br><br>
@@ -119,7 +137,9 @@
 
             <td>
                 {% if row[4] == teacher %}
-                    <span class="badge substitute-badge">🔁 Substitute</span>
+                    <span class="badge substitute-badge">🔁 Substitute Class</span>
+                {% elif row[4] %}
+                    <span class="badge covered-badge">🟡 Covered by {{ row[4] }}</span>
                 {% else %}
                     <span class="badge regular-badge">📘 Regular</span>
                 {% endif %}
@@ -130,7 +150,7 @@
     </div>
 
     {% else %}
-        <h3 class="no-data">📭 No timetable assigned yet</h3>
+        <h3 class="no-data">📭 No timetable assigned</h3>
     {% endif %}
 
     <br><br>

@@ -249,14 +249,20 @@ def get_substitute(day, period):
 
 @app.route('/timetable')
 def timetable():
+    selected_day = request.args.get('day')
+
     conn = get_db_connection()
     cur = conn.cursor()
 
-    cur.execute("SELECT * FROM timetable")
-    data = cur.fetchall()
+    if selected_day:
+        cur.execute("SELECT * FROM timetable WHERE day=%s", (selected_day,))
+    else:
+        cur.execute("SELECT * FROM timetable")
 
+    data = cur.fetchall()
     conn.close()
-    return render_template('timetable.html', data=data)
+
+    return render_template('timetable.html', data=data, selected_day=selected_day)
 
 
 
@@ -360,21 +366,31 @@ def dashboard():
         return redirect('/login')
 
     name = session['teacher']
+    selected_day = request.args.get('day')
 
     conn = get_db_connection()
     cur = conn.cursor()
 
-    cur.execute("""
-    SELECT day, period, subject, class, substitute
-    FROM timetable
-    WHERE teacher=%s OR substitute=%s
-    """, (name, name))
+    if selected_day:
+        cur.execute("""
+        SELECT day, period, subject, class, substitute
+        FROM timetable
+        WHERE (teacher=%s OR substitute=%s) AND day=%s
+        """, (name, name, selected_day))
+    else:
+        cur.execute("""
+        SELECT day, period, subject, class, substitute
+        FROM timetable
+        WHERE teacher=%s OR substitute=%s
+        """, (name, name))
 
     timetable = cur.fetchall()
     conn.close()
 
-    return render_template('teacher.html', timetable=timetable, teacher=name)
-
+    return render_template('teacher.html',
+                           timetable=timetable,
+                           teacher=name,
+                           selected_day=selected_day)
 
 # ---------------- ADMIN ----------------
 
@@ -402,16 +418,16 @@ def admin_login():
                     session['admin'] = username
                     return redirect('/admin-dashboard')
                 else:
-                    error = "Invalid credentials"
+                    flash("❌ Invalid username or password", "error")
             else:
                 # ⚠️ Plain password (old DB)
                 if password == stored_password:
                     session['admin'] = username
                     return redirect('/admin-dashboard')
                 else:
-                    error = "Invalid credentials"
+                    flash("❌ Invalid username or password", "error")
         else:
-            error = "Invalid credentials"
+            flash("❌ Invalid username or password", "error")
 
     conn.close()
     return render_template('admin_login.html', error=error)
@@ -455,7 +471,58 @@ def logout():
     return redirect('/')
 
 
+@app.route('/change-admin-password', methods=['GET', 'POST'])
+def change_admin_password():
+    if 'admin' not in session:
+        return redirect('/admin-login')
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    msg = None
+
+    if request.method == 'POST':
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+
+        cur.execute("SELECT password FROM admin WHERE username=%s", (session['admin'],))
+        data = cur.fetchone()
+
+        if data:
+            stored_password = data[0]
+
+            # ✅ Handle hashed password
+            if stored_password.startswith("$2b$"):
+                if bcrypt.checkpw(old_password.encode(), stored_password.encode()):
+                    hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+                    cur.execute("UPDATE admin SET password=%s WHERE username=%s",
+                                (hashed, session['admin']))
+                    conn.commit()
+                    flash("✅ Password updated successfully!", "success")
+                else:
+                    flash("❌ Wrong old password", "error")
+
+            # ⚠️ Handle old plain password
+            else:
+                if old_password == stored_password:
+                    hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+                    cur.execute("UPDATE admin SET password=%s WHERE username=%s",
+                                (hashed, session['admin']))
+                    conn.commit()
+                    flash("✅ Password updated successfully!", "success")
+                else:
+                    flash("❌ Wrong old password", "error")
+
+    conn.close()
+    return render_template('change_password.html', msg=msg)
+
+
 # ---------------- OTP RESET ----------------
+
+
+@app.route('/forgot-password', methods=['GET'])
+def forgot_password():
+    return render_template('forgot_password.html')
 
 @app.route('/send-otp', methods=['POST'])
 def send_otp_route():
@@ -479,9 +546,11 @@ def send_otp_route():
         conn.commit()
         send_otp(email, otp)
 
+        flash("✅ OTP sent to your email", "success")
         return render_template('verify_otp.html', username=username)
 
-    return "Username not found"
+    flash("❌ Username not found", "error")
+    return redirect('/forgot-password')
 
 
 @app.route('/verify-otp', methods=['POST'])
