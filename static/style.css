@@ -1,402 +1,86 @@
-/* ===== GLOBAL ===== */
+/* ================= GLOBAL ================= */
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f4f6f9;
     margin: 0;
-    padding: 0;
-    text-align: center;
+    padding-top: 70px; /* Fix navbar overlap */
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f6f9;
+    color: #2c3e50;
 }
 
-/* Container */
-.container {
-    width: 90%;
-    max-width: 1100px;
-    margin: auto;
-    padding-top: 80px;
-}
-
-/* ===== NAVBAR ===== */
+/* ================= NAVBAR ================= */
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    background: #2c3e50;
+    background: #1e293b;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 12px 20px;
+    box-sizing: border-box;
     z-index: 1000;
 }
 
 .logo {
     color: white;
-    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.nav-links {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
 }
 
 .nav-links a {
-    color: white;
+    color: #e2e8f0;
     text-decoration: none;
-    margin-left: 15px;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 14px;
     transition: 0.3s;
 }
 
 .nav-links a:hover {
-    color: #4CAF50;
+    color: #38bdf8;
 }
 
-/* ===== HEADINGS ===== */
-h1 {
-    color: #2c3e50;
-}
-
-h2 {
-    color: #555;
-}
-
-/* ===== DARK MODE BUTTON ===== */
-.dark-btn {
-    position: fixed;
-    top: 70px;
-    right: 20px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 50%;
-    background: #333;
-    color: white;
-    cursor: pointer;
-}
-
-/* ===== SEARCH ===== */
-#search {
-    width: 60%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    transition: 0.3s;
-}
-
-#search:focus {
-    border-color: #4CAF50;
-    box-shadow: 0 0 5px rgba(76,175,80,0.3);
-}
-
-/* ===== TABLE ===== */
-.table-container {
-    overflow-x: auto;
-}
-
-.timetable {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-}
-
-.timetable th {
-    background: linear-gradient(45deg, #4CAF50, #43a047);
-    color: white;
-    padding: 12px;
-    cursor: pointer;
-}
-
-.timetable td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-}
-
-.timetable tr:nth-child(even) {
-    background: #fafafa;
-}
-
-.timetable tr:hover {
-    background: #f1f8f4;
-}
-
-/* ===== BADGES ===== */
-.badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.regular-badge {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.substitute-badge {
-    background: #fff3e0;
-    color: #ef6c00;
-    font-weight: bold;
-}
-
-.day-badge {
-    background: #e3f2fd;
-    border-radius: 8px;
-    padding: 6px 10px;
-}
-
-/* ===== BUTTONS ===== */
-.btn {
-    padding: 10px;
-    background: linear-gradient(45deg, #4CAF50, #43a047);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background: #388e3c;
-}
-
-/* Action buttons */
-.action-btn {
-    padding: 5px 8px;
-    border-radius: 6px;
-    text-decoration: none;
-    margin: 2px;
-}
-
-.action-btn.edit {
-    background: #2196F3;
-    color: white;
-}
-
-.action-btn.delete {
-    background: #f44336;
-    color: white;
-}
-
-/* ===== CARDS ===== */
-.login-card, .form-card {
-    width: 350px;
+/* ================= CONTAINER ================= */
+.container {
+    width: 90%;
+    max-width: 1100px;
     margin: auto;
+    text-align: center;
+}
+
+/* ================= LOGIN CARD ================= */
+.login-card {
+    width: 400px;
+    max-width: 90%;
+    margin: 40px auto;
     padding: 25px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
 }
 
-/* Dashboard cards */
-.dashboard {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.action-card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    width: 200px;
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.action-card:hover {
-    transform: translateY(-5px);
-}
-
-.action-card.logout {
-    background: #f44336;
-    color: white;
-}
-
-/* ===== FORM ===== */
+/* ================= FORM ================= */
 input, select {
     width: 100%;
     padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-/* ===== LINKS ===== */
-.back-btn, .logout-btn {
-    padding: 10px 15px;
-    background: #2c3e50;
-    color: white;
-    border-radius: 8px;
-    text-decoration: none;
-}
-
-.back-btn:hover, .logout-btn:hover {
-    background: #1a252f;
-}
-
-.error {
-    color: red;
-}
-
-/* ===== DARK MODE (FIXED PROPERLY) ===== */
-.dark-mode {
-    background: #121212;
-    color: #e0e0e0;
-}
-
-/* Navbar */
-.dark-mode .navbar {
-    background: #1e1e1e;
-}
-
-/* Table */
-.dark-mode .timetable {
-    background: #1e1e1e;
-}
-
-.dark-mode .timetable th {
-    background: #2e7d32;
-}
-
-.dark-mode .timetable tr:nth-child(even) {
-    background: #2a2a2a;
-}
-
-.dark-mode .timetable td {
-    color: #e0e0e0;
-    border-bottom: 1px solid #333;
-}
-
-/* Cards */
-.dark-mode .login-card,
-.dark-mode .form-card,
-.dark-mode .action-card {
-    background: #1e1e1e;
-    color: white;
-}
-
-/* Inputs */
-.dark-mode input,
-.dark-mode select {
-    background: #2c2c2c;
-    color: white;
-    border: 1px solid #555;
-}
-
-/* Buttons */
-.dark-mode .btn {
-    background: #2e7d32;
-}
-
-/* Links */
-.dark-mode a {
-    color: #90caf9;
-}
-
-/* Badges */
-.dark-mode .regular-badge {
-    background: #1b5e20;
-    color: #a5d6a7;
-}
-
-.dark-mode .substitute-badge {
-    background: #e65100;
-    color: #ffe0b2;
-}
-
-/* Flash Messages */
-.flash {
-    padding: 10px;
-    margin: 10px auto;
-    width: 60%;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.flash.success {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.flash.error {
-    background: #ffebee;
-    color: #c62828;
-}
-
-/* ===== LAYOUT ===== */
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    background: #f4f6f9;
-}
-
-/* SIDEBAR */
-.sidebar {
-    width: 220px;
-    height: 100vh;
-    background: #1e293b;
-    color: white;
-    padding: 20px;
-    position: fixed;
-}
-
-.sidebar h2 {
-    margin-bottom: 30px;
-}
-
-.sidebar a {
-    display: block;
-    color: #cbd5e1;
-    text-decoration: none;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-}
-
-.sidebar a:hover {
-    background: #334155;
-    color: white;
-}
-
-/* MAIN */
-.main {
-    margin-left: 240px;
-    width: 100%;
-    padding: 20px;
-}
-
-/* TOPBAR */
-.topbar {
-    background: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-
-/* GRID */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 20px;
-}
-
-/* CARD */
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-}
-
-/* INPUTS */
-input, select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
+    margin-top: 6px;
     margin-bottom: 12px;
     border-radius: 8px;
     border: 1px solid #ccc;
 }
 
-/* BUTTON */
+input:focus, select:focus {
+    border-color: #2563eb;
+    outline: none;
+}
+
+/* ================= BUTTON ================= */
 .btn {
     width: 100%;
     padding: 10px;
@@ -411,7 +95,133 @@ input, select {
     background: #1d4ed8;
 }
 
-/* FLASH */
+/* ================= CENTER BUTTONS ================= */
+.center-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin: 40px auto;
+    width: 100%;
+}
+
+.center-actions a {
+    padding: 12px 22px;
+    background: #1e293b;
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.center-actions .logout-btn {
+    background: #dc2626;
+}
+
+/* ================= TABLE ================= */
+.table-container {
+    overflow-x: auto;
+}
+
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.timetable th {
+    background: #2563eb;
+    color: white;
+    padding: 12px;
+}
+
+.timetable td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.timetable tr:nth-child(even) {
+    background: #fafafa;
+}
+
+/* ================= BADGES ================= */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.regular-badge {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.substitute-badge {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.day-badge {
+    background: #e0f2fe;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+/* ================= GRID TIMETABLE ================= */
+.grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.grid-table th,
+.grid-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.grid-table th {
+    background: #2563eb;
+    color: white;
+}
+
+.period {
+    font-weight: bold;
+    background: #f1f5f9;
+}
+
+/* CELL */
+.cell {
+    font-size: 13px;
+}
+
+.subject {
+    font-weight: bold;
+}
+
+.class {
+    font-size: 12px;
+}
+
+.teacher {
+    font-size: 12px;
+    color: #555;
+}
+
+.substitute {
+    font-size: 12px;
+    color: green;
+}
+
+.empty {
+    color: #aaa;
+}
+
+/* ================= FLASH ================= */
 .flash {
     padding: 10px;
     border-radius: 8px;
@@ -428,12 +238,33 @@ input, select {
     color: #991b1b;
 }
 
-.message.success {
-    color: green;
-    font-weight: bold;
+/* ================= DARK MODE ================= */
+.dark-mode {
+    background: #121212;
+    color: #e0e0e0;
 }
 
-.message.error {
-    color: red;
-    font-weight: bold;
+.dark-mode .navbar {
+    background: #0f172a;
+}
+
+.dark-mode .login-card {
+    background: #1e1e1e;
+}
+
+.dark-mode input,
+.dark-mode select {
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #555;
+}
+
+.dark-mode .timetable,
+.dark-mode .grid-table {
+    background: #1e1e1e;
+}
+
+.dark-mode .timetable th,
+.dark-mode .grid-table th {
+    background: #1d4ed8;
 }

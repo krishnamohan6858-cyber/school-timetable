@@ -166,8 +166,22 @@ def get_busy_teachers(day, period):
     conn.close()
     return busy
 
+# @app.route('/')
+# def home():
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("SELECT name FROM teachers")
+#     teachers = [t[0] for t in cur.fetchall()]
+
+#     conn.close()
+#     return render_template('index.html', teachers=teachers)
+
 @app.route('/')
 def home():
+    if 'admin' not in session:
+        return redirect('/login')   # Teachers go to login
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -247,27 +261,159 @@ def get_substitute(day, period):
 
 # # ---------------- ROUTES ----------------
 
+
 @app.route('/timetable')
 def timetable():
-    selected_day = request.args.get('day')
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM timetable")
+    data = cur.fetchall()
+
+    # Convert to grid format
+    grid = {}
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+    for d in days:
+        grid[d] = {}
+
+    for row in data:
+        _, class_name, day, period, subject, teacher, substitute = row
+
+        grid[day][period] = {
+            "id": row[0],
+            "class": class_name,
+            "subject": subject,
+            "teacher": teacher,
+            "substitute": substitute
+        }
+
+    # Get teachers list (for manual substitute dropdown)
+    cur.execute("SELECT name FROM teachers")
+    teachers = [t[0] for t in cur.fetchall()]
+
+    conn.close()
+
+    return render_template(
+        'timetable_grid.html',
+        grid=grid,
+        days=days,
+        periods=range(1, 11),
+        teachers=teachers
+    )
+
+
+
+# @app.route('/update-substitute/<int:id>', methods=['POST'])
+# def update_substitute(id):
+#     if 'admin' not in session:
+#         return redirect('/admin-login')
+
+#     new_sub = request.form['substitute']
+
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     # Get day & period
+#     cur.execute("SELECT day, period FROM timetable WHERE id=%s", (id,))
+#     day, period = cur.fetchone()
+
+#     # Check if teacher busy
+#     cur.execute("""
+#     SELECT * FROM timetable
+#     WHERE teacher=%s AND day=%s AND period=%s
+#     """, (new_sub, day, period))
+
+#     if cur.fetchone():
+#         conn.close()
+#         flash("⚠️ Teacher already busy in this period!", "error")
+#         return redirect('/timetable')
+
+#     # Update
+#     cur.execute("""
+#     UPDATE timetable SET substitute=%s WHERE id=%s
+#     """, (new_sub, id))
+
+#     conn.commit()
+#     conn.close()
+
+#     flash("✅ Substitute updated!", "success")
+#     return redirect('/timetable')
+
+
+@app.route('/update-substitute/<int:id>', methods=['POST'])
+def update_substitute(id):
+    if 'admin' not in session:
+        return redirect('/admin-login')   # 🔒 KEY FIX
+
+    substitute = request.form['substitute']
 
     conn = get_db_connection()
     cur = conn.cursor()
 
-    if selected_day:
-        cur.execute("SELECT * FROM timetable WHERE day=%s", (selected_day,))
-    else:
-        cur.execute("SELECT * FROM timetable")
+    cur.execute("""
+        UPDATE timetable
+        SET substitute=%s
+        WHERE id=%s
+    """, (substitute, id))
 
-    data = cur.fetchall()
+    conn.commit()
     conn.close()
 
-    return render_template('timetable.html', data=data, selected_day=selected_day)
+    flash("✅ Substitute updated!", "success")
+    return redirect('/timetable')
 
 
+# @app.route('/add', methods=['POST'])
+# def add():
+#     class_name = request.form['class'].strip()
+#     day = request.form['day']
+#     period = request.form['period']
+#     subject = request.form['subject']
+#     teacher = request.form['teacher']
+
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     # ❌ Check 1: Class already assigned
+#     cur.execute("""
+#     SELECT * FROM timetable
+#     WHERE class=%s AND day=%s AND period=%s
+#     """, (class_name, day, period))
+
+#     if cur.fetchone():
+#         conn.close()
+#         flash("⚠️ This class already has a subject assigned in this period!", "error")
+#         return redirect('/')
+
+#     # ❌ Check 2: Teacher already busy
+#     cur.execute("""
+#     SELECT * FROM timetable
+#     WHERE teacher=%s AND day=%s AND period=%s
+#     """, (teacher, day, period))
+
+#     if cur.fetchone():
+#         conn.close()
+#         flash("⚠️ This teacher already has a class in this period!", "error")
+#         return redirect('/')
+
+#     # ✅ Insert if valid
+#     cur.execute("""
+#     INSERT INTO timetable (class, day, period, subject, teacher, substitute)
+#     VALUES (%s, %s, %s, %s, %s, %s)
+#     """, (class_name, day, period, subject, teacher, ""))
+
+#     conn.commit()
+#     conn.close()
+
+#     flash("✅ Entry added successfully!", "success")
+#     return redirect('/')
 
 @app.route('/add', methods=['POST'])
 def add():
+    if 'admin' not in session:
+        return redirect('/admin-login')   # 🔒 Restrict
+
     class_name = request.form['class'].strip()
     day = request.form['day']
     period = request.form['period']
@@ -277,7 +423,7 @@ def add():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # ❌ Check 1: Class already assigned
+    # Check class conflict
     cur.execute("""
     SELECT * FROM timetable
     WHERE class=%s AND day=%s AND period=%s
@@ -285,10 +431,10 @@ def add():
 
     if cur.fetchone():
         conn.close()
-        flash("⚠️ This class already has a subject assigned in this period!", "error")
+        flash("⚠️ Class already assigned!", "error")
         return redirect('/')
 
-    # ❌ Check 2: Teacher already busy
+    # Check teacher conflict
     cur.execute("""
     SELECT * FROM timetable
     WHERE teacher=%s AND day=%s AND period=%s
@@ -296,10 +442,9 @@ def add():
 
     if cur.fetchone():
         conn.close()
-        flash("⚠️ This teacher already has a class in this period!", "error")
+        flash("⚠️ Teacher already busy!", "error")
         return redirect('/')
 
-    # ✅ Insert if valid
     cur.execute("""
     INSERT INTO timetable (class, day, period, subject, teacher, substitute)
     VALUES (%s, %s, %s, %s, %s, %s)
@@ -308,7 +453,7 @@ def add():
     conn.commit()
     conn.close()
 
-    flash("✅ Entry added successfully!", "success")
+    flash("✅ Entry added!", "success")
     return redirect('/')
 
 
@@ -360,37 +505,6 @@ def login():
     return render_template('login.html', teachers=teachers, error=error)
 
 
-# @app.route('/dashboard')
-# def dashboard():
-#     if 'teacher' not in session:
-#         return redirect('/login')
-
-#     name = session['teacher']
-#     selected_day = request.args.get('day')
-
-#     conn = get_db_connection()
-#     cur = conn.cursor()
-
-#     if selected_day:
-#         cur.execute("""
-#         SELECT day, period, subject, class, substitute
-#         FROM timetable
-#         WHERE (teacher=%s OR substitute=%s) AND day=%s
-#         """, (name, name, selected_day))
-#     else:
-#         cur.execute("""
-#         SELECT day, period, subject, class, substitute
-#         FROM timetable
-#         WHERE teacher=%s OR substitute=%s
-#         """, (name, name))
-
-#     timetable = cur.fetchall()
-#     conn.close()
-
-#     return render_template('teacher.html',
-#                            timetable=timetable,
-#                            teacher=name,
-#                            selected_day=selected_day)
 
 @app.route('/dashboard')
 def dashboard():
@@ -642,8 +756,22 @@ def workload_data():
 
 
 #-------------edit----------------#
+# @app.route('/edit/<int:id>')
+# def edit(id):
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("SELECT * FROM timetable WHERE id=%s", (id,))
+#     row = cur.fetchone()
+
+#     conn.close()
+#     return render_template('edit.html', row=row)
+
 @app.route('/edit/<int:id>')
 def edit(id):
+    if 'admin' not in session:
+        return redirect('/admin-login')
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -654,8 +782,35 @@ def edit(id):
     return render_template('edit.html', row=row)
 
 
+# @app.route('/update/<int:id>', methods=['POST'])
+# def update(id):
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("""
+#     UPDATE timetable
+#     SET class=%s, day=%s, period=%s, subject=%s, teacher=%s
+#     WHERE id=%s
+#     """, (
+#         request.form['class'],
+#         request.form['day'],
+#         request.form['period'],
+#         request.form['subject'],
+#         request.form['teacher'],
+#         id
+#     ))
+
+#     conn.commit()
+#     conn.close()
+
+#     flash("Updated successfully!", "success")
+#     return redirect('/timetable')
+
 @app.route('/update/<int:id>', methods=['POST'])
 def update(id):
+    if 'admin' not in session:
+        return redirect('/admin-login')
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -679,8 +834,24 @@ def update(id):
     return redirect('/timetable')
 
 #----------delete entries----------#
+# @app.route('/delete/<int:id>')
+# def delete(id):
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("DELETE FROM timetable WHERE id=%s", (id,))
+
+#     conn.commit()
+#     conn.close()
+
+#     flash("Entry deleted successfully!", "success")
+#     return redirect('/timetable')
+
 @app.route('/delete/<int:id>')
 def delete(id):
+    if 'admin' not in session:
+        return redirect('/admin-login')
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -689,7 +860,7 @@ def delete(id):
     conn.commit()
     conn.close()
 
-    flash("Entry deleted successfully!", "success")
+    flash("Deleted successfully!", "success")
     return redirect('/timetable')
 
 

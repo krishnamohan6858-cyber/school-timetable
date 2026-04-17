@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grid Timetable</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="navbar">
+    <h2 class="logo">📘 OISM Timetable</h2>
+</div>
+
+<div class="container">
+
+    <h1>📅 School Grid Timetable</h1>
+
+    <div class="table-container">
+
+    <table class="grid-table">
+
+        <!-- HEADER -->
+        <thead>
+        <tr>
+            <th>Period</th>
+            {% for day in days %}
+                <th>{{ day }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <!-- BODY -->
+        <tbody>
+        {% for p in periods %}
+        <tr>
+            <td class="period">{{ p }}</td>
+
+            {% for day in days %}
+            <td>
+
+                {% if grid[day][p] %}
+                <div class="cell">
+
+                    <div class="subject">
+                        {{ grid[day][p].subject }}
+                    </div>
+
+                    <div class="class">
+                        {{ grid[day][p].class }}
+                    </div>
+
+                    <div class="teacher">
+                        👨‍🏫 {{ grid[day][p].teacher }}
+                    </div>
+
+                    {% if grid[day][p].substitute %}
+                    <div class="substitute">
+                        🔁 {{ grid[day][p].substitute }}
+                    </div>
+                    {% endif %}
+
+                    <!-- 🔒 ONLY ADMIN CAN SEE -->
+                    {% if 'admin' in session %}
+                    <form action="/update-substitute/{{ grid[day][p].id }}" method="POST" class="sub-form">
+                        <select name="substitute">
+                            <option value="">Assign</option>
+                            {% for t in teachers %}
+                                <option value="{{ t }}">{{ t }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">✔</button>
+                    </form>
+                    {% endif %}
+
+                </div>
+
+                {% else %}
+                    <span class="empty">—</span>
+                {% endif %}
+
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+
+    </div>
+
+    <br>
+
+    <a href="/" class="back-btn">⬅ Back</a>
+
+</div>
+
+</body>
+</html>
