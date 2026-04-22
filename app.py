@@ -271,39 +271,81 @@ def get_substitute(day, period):
 # # ---------------- ROUTES ----------------
 
 
+# @app.route('/timetable')
+# def timetable():
+
+#     # 🔥 AUTO RESET (midnight logic)
+#     reset_daily_substitutions()
+
+#     conn = get_db_connection()
+#     cur = conn.cursor()
+
+#     cur.execute("SELECT * FROM timetable")
+#     data = cur.fetchall()
+
+#     # Convert to grid format
+#     grid = {}
+#     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+#     for d in days:
+#         grid[d] = {}
+
+#     for row in data:
+#         # 👇 UPDATED unpacking (added substitute_date)
+#         id, class_name, day, period, subject, teacher, substitute, substitute_date = row
+
+#         grid[day][period] = {
+#             "id": id,
+#             "class": class_name,
+#             "subject": subject,
+#             "teacher": teacher,
+#             "substitute": substitute,
+#             "substitute_date": substitute_date   # 🔥 IMPORTANT
+#         }
+
+#     # Get teachers list (for dropdown)
+#     cur.execute("SELECT name FROM teachers")
+#     teachers = [t[0] for t in cur.fetchall()]
+
+#     conn.close()
+
+#     return render_template(
+#         'timetable_grid.html',
+#         grid=grid,
+#         days=days,
+#         periods=range(1, 11),
+#         teachers=teachers
+#     )
+
 @app.route('/timetable')
 def timetable():
-
-    # 🔥 AUTO RESET (midnight logic)
-    reset_daily_substitutions()
-
     conn = get_db_connection()
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM timetable")
     data = cur.fetchall()
 
-    # Convert to grid format
     grid = {}
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
     for d in days:
         grid[d] = {}
 
+    classes = set()
+
     for row in data:
-        # 👇 UPDATED unpacking (added substitute_date)
-        id, class_name, day, period, subject, teacher, substitute, substitute_date = row
+        _, class_name, day, period, subject, teacher, substitute, substitute_date = row
+
+        classes.add(class_name)
 
         grid[day][period] = {
-            "id": id,
+            "id": row[0],
             "class": class_name,
             "subject": subject,
             "teacher": teacher,
-            "substitute": substitute,
-            "substitute_date": substitute_date   # 🔥 IMPORTANT
+            "substitute": substitute
         }
 
-    # Get teachers list (for dropdown)
     cur.execute("SELECT name FROM teachers")
     teachers = [t[0] for t in cur.fetchall()]
 
@@ -314,7 +356,8 @@ def timetable():
         grid=grid,
         days=days,
         periods=range(1, 11),
-        teachers=teachers
+        teachers=teachers,
+        classes=sorted(list(classes))  # 🔥 IMPORTANT
     )
 
 

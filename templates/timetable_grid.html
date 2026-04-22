@@ -44,6 +44,27 @@
         })
         .then(() => location.reload());
     }
+
+    // 🔥 MAIN FILTER FUNCTION
+    function applyFilters() {
+        const selectedClass = document.getElementById("classFilter").value.toLowerCase();
+        const selectedTeacher = document.getElementById("teacherFilter").value.toLowerCase();
+        const searchText = document.getElementById("searchInput").value.toLowerCase();
+
+        document.querySelectorAll(".cell").forEach(cell => {
+            const cls = cell.querySelector(".class")?.dataset.class.toLowerCase() || "";
+            const teacher = cell.querySelector(".teacher")?.dataset.teacher.toLowerCase() || "";
+            const subject = cell.querySelector(".subject")?.dataset.subject.toLowerCase() || "";
+
+            let show = true;
+
+            if (selectedClass && cls !== selectedClass) show = false;
+            if (selectedTeacher && teacher !== selectedTeacher) show = false;
+            if (searchText && !subject.includes(searchText)) show = false;
+
+            cell.style.display = show ? "flex" : "none";
+        });
+    }
     </script>
 </head>
 
@@ -65,6 +86,29 @@
 <div class="container">
 
     <h1>📅 Weekly Timetable</h1>
+
+    <!-- 🔥 FILTER BAR -->
+    <div class="filter-bar">
+
+        <select id="classFilter" onchange="applyFilters()">
+            <option value="">All Classes</option>
+            {% for cls in classes %}
+            <option value="{{ cls }}">{{ cls }}</option>
+            {% endfor %}
+        </select>
+
+        <select id="teacherFilter" onchange="applyFilters()">
+            <option value="">All Teachers</option>
+            {% for t in teachers %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" id="searchInput"
+               placeholder="🔍 Search subject..."
+               onkeyup="applyFilters()">
+
+    </div>
 
     <div class="table-container">
         <table class="grid-table">
@@ -94,15 +138,15 @@
                     <!-- VIEW MODE -->
                     <div class="view-mode">
 
-                        <div class="subject">
+                        <div class="subject" data-subject="{{ grid[day][p].subject }}">
                             {{ grid[day][p].subject }}
                         </div>
 
-                        <div class="class">
+                        <div class="class" data-class="{{ grid[day][p].class }}">
                             Class {{ grid[day][p].class }}
                         </div>
 
-                        <div class="teacher">
+                        <div class="teacher" data-teacher="{{ grid[day][p].teacher }}">
                             👨‍🏫 {{ grid[day][p].teacher }}
                         </div>
 
