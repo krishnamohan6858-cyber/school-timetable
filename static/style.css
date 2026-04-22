@@ -1,45 +1,35 @@
 /* ================= GLOBAL ================= */
 body {
     margin: 0;
-    padding-top: 70px; /* Fix navbar overlap */
     font-family: 'Segoe UI', sans-serif;
-    background: #f4f6f9;
-    color: #2c3e50;
+    background: #f1f5f9;
+    color: #1e293b;
 }
 
 /* ================= NAVBAR ================= */
 .navbar {
-    position: fixed;
+    position: sticky;
     top: 0;
     width: 100%;
-    background: #1e293b;
+    background: #0f172a;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    box-sizing: border-box;
+    padding: 14px 30px;
     z-index: 1000;
 }
 
 .logo {
-    color: white;
-    font-size: 18px;
+    color: #38bdf8;
+    font-size: 20px;
     font-weight: bold;
-    white-space: nowrap;
-}
-
-.nav-links {
-    display: flex;
-    gap: 18px;
-    flex-wrap: wrap;
 }
 
 .nav-links a {
-    color: #e2e8f0;
+    color: #cbd5f5;
     text-decoration: none;
-    font-weight: 600;
+    margin-left: 20px;
     font-size: 14px;
-    transition: 0.3s;
 }
 
 .nav-links a:hover {
@@ -48,269 +38,227 @@ body {
 
 /* ================= CONTAINER ================= */
 .container {
-    width: 90%;
-    max-width: 1100px;
-    margin: auto;
-    text-align: center;
+    width: 95%;
+    max-width: 1200px;
+    margin: 30px auto;
 }
 
-/* ================= LOGIN CARD ================= */
-.login-card {
-    width: 400px;
-    max-width: 90%;
-    margin: 40px auto;
-    padding: 25px;
+/* ================= HEADINGS ================= */
+h1 {
+    margin-bottom: 20px;
+    font-size: 26px;
+}
+
+/* ================= TABLE ================= */
+.table-container {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.grid-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.grid-table th {
+    background: #2563eb;
+    color: white;
+    padding: 14px;
+    font-size: 14px;
+}
+
+.grid-table td {
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    height: 90px;
+    vertical-align: top;
+}
+
+/* PERIOD COLUMN */
+.period {
+    font-weight: bold;
+    background: #f8fafc;
+}
+
+/* ================= CELL ================= */
+.cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.subject {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.class {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.teacher {
+    font-size: 12px;
+    color: #334155;
+}
+
+.substitute {
+    font-size: 12px;
+    color: #16a34a;
+    font-weight: 500;
+}
+
+/* EMPTY CELL */
+.empty {
+    color: #cbd5f5;
+}
+
+/* ================= BUTTONS ================= */
+button {
+    border: none;
+    padding: 5px 8px;
+    font-size: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+/* EDIT BUTTON */
+.edit-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+    background: #ef4444;
+    color: white;
+}
+
+/* SAVE BUTTON */
+.save-btn {
+    background: #22c55e;
+    color: white;
+}
+
+/* CANCEL BUTTON */
+.cancel-btn {
+    background: #64748b;
+    color: white;
 }
 
 /* ================= FORM ================= */
 input, select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    width: 95%;
+    padding: 6px;
+    margin-top: 4px;
+    border-radius: 6px;
+    border: 1px solid #cbd5f5;
+    font-size: 12px;
 }
 
 input:focus, select:focus {
-    border-color: #2563eb;
     outline: none;
+    border-color: #2563eb;
 }
 
-/* ================= BUTTON ================= */
+/* ================= EDIT MODE ================= */
+.edit-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* ================= DASHBOARD ================= */
+.dashboard-layout {
+    display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    background: #0f172a;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.sidebar .logo {
+    color: #38bdf8;
+    margin-bottom: 20px;
+}
+
+.nav-item {
+    display: block;
+    padding: 10px;
+    color: #cbd5f5;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.nav-item:hover {
+    background: #1e293b;
+}
+
+.logout {
+    margin-top: 20px;
+    color: #ef4444;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* TOPBAR */
+.topbar {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* ================= LOGIN ================= */
+.login-card {
+    width: 350px;
+    margin: 80px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-card h2 {
+    margin-bottom: 15px;
+}
+
 .btn {
     width: 100%;
     padding: 10px;
     background: #2563eb;
     color: white;
-    border: none;
     border-radius: 8px;
-    cursor: pointer;
+    margin-top: 10px;
 }
 
 .btn:hover {
     background: #1d4ed8;
 }
 
-/* ================= CENTER BUTTONS ================= */
-.center-actions {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-    margin: 40px auto;
-    width: 100%;
-}
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
 
-.center-actions a {
-    padding: 12px 22px;
-    background: #1e293b;
-    color: white;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.center-actions .logout-btn {
-    background: #dc2626;
-}
-
-/* ================= TABLE ================= */
-.table-container {
-    overflow-x: auto;
-}
-
-.timetable {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.timetable th {
-    background: #2563eb;
-    color: white;
-    padding: 12px;
-}
-
-.timetable td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-}
-
-.timetable tr:nth-child(even) {
-    background: #fafafa;
-}
-
-/* ================= BADGES ================= */
-.badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.regular-badge {
-    background: #e0f2fe;
-    color: #0369a1;
-}
-
-.substitute-badge {
-    background: #fff7ed;
-    color: #ea580c;
-}
-
-.day-badge {
-    background: #e0f2fe;
-    padding: 5px 10px;
-    border-radius: 6px;
-}
-
-/* ================= GRID TIMETABLE ================= */
-.grid-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-.grid-table th,
-.grid-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-    vertical-align: top;
-}
-
-.grid-table th {
-    background: #2563eb;
-    color: white;
-}
-
-.period {
-    font-weight: bold;
-    background: #f1f5f9;
-}
-
-/* CELL */
-.cell {
-    font-size: 13px;
-}
-
-.subject {
-    font-weight: bold;
-}
-
-.class {
-    font-size: 12px;
-}
-
-.teacher {
-    font-size: 12px;
-    color: #555;
-}
-
-.substitute {
-    font-size: 12px;
-    color: green;
-}
-
-.empty {
-    color: #aaa;
-}
-
-/* ================= FLASH ================= */
-.flash {
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.flash.success {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.flash.error {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-/* ================= DARK MODE ================= */
-.dark-mode {
-    background: #121212;
-    color: #e0e0e0;
-}
-
-.dark-mode .navbar {
-    background: #0f172a;
-}
-
-.dark-mode .login-card {
-    background: #1e1e1e;
-}
-
-.dark-mode input,
-.dark-mode select {
-    background: #2c2c2c;
-    color: white;
-    border: 1px solid #555;
-}
-
-.dark-mode .timetable,
-.dark-mode .grid-table {
-    background: #1e1e1e;
-}
-
-.dark-mode .timetable th,
-.dark-mode .grid-table th {
-    background: #1d4ed8;
-}
-
-/* GRID ACTION BUTTONS FIX */
-.grid-actions {
-    margin-top: 6px;
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-}
-
-.edit-btn {
-    background: #2196F3;
-    color: white;
-    padding: 4px 8px;
-    font-size: 11px;
-    border-radius: 5px;
-    text-decoration: none;
-}
-
-.delete-btn {
-    background: #f44336;
-    color: white;
-    padding: 4px 8px;
-    font-size: 11px;
-    border-radius: 5px;
-    text-decoration: none;
-}
-
-.edit-btn:hover {
-    background: #1976d2;
-}
-
-.delete-btn:hover {
-    background: #d32f2f;
-}
-.edit-mode input {
-    width: 90%;
-    margin: 2px 0;
-    padding: 4px;
-    font-size: 12px;
-}
-
-.edit-mode button {
-    margin-top: 3px;
-    font-size: 11px;
-    padding: 3px 6px;
+    .container {
+        width: 100%;
+    }
 }

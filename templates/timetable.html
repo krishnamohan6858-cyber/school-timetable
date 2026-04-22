@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Dashboard</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -37,11 +36,11 @@
 
         <div class="content-area">
 
-            <!-- 🔽 PUT YOUR PAGE CONTENT HERE -->
             <div class="table-container">
 
                 <table class="grid-table">
 
+                    <!-- HEADER -->
                     <thead>
                     <tr>
                         <th>Period</th>
@@ -51,6 +50,7 @@
                     </tr>
                     </thead>
 
+                    <!-- BODY -->
                     <tbody>
                     {% for p in periods %}
                     <tr>
@@ -71,28 +71,37 @@
                                 </div>
 
                                 <div class="teacher">
-                                    {{ grid[day][p].teacher }}
+                                    👨‍🏫 {{ grid[day][p].teacher }}
                                 </div>
 
-                                {% if grid[day][p].substitute %}
+                                <!-- ✅ SHOW ONLY TODAY'S SUBSTITUTE -->
+                                {% if grid[day][p].substitute and grid[day][p].substitute_date %}
                                 <div class="substitute">
                                     🔁 {{ grid[day][p].substitute }}
                                 </div>
                                 {% endif %}
 
+                                <!-- ✅ ADMIN ONLY -->
                                 {% if 'admin' in session %}
                                 <form action="/update-substitute/{{ grid[day][p].id }}" method="POST" class="sub-form">
+
                                     <select name="substitute">
-                                        <option value="">Assign</option>
+                                        <option value="">Assign Substitute</option>
+
                                         {% for t in teachers %}
-                                            <option value="{{ t }}">{{ t }}</option>
+                                        <option value="{{ t }}"
+                                            {% if t == grid[day][p].substitute %}selected{% endif %}>
+                                            {{ t }}
+                                        </option>
                                         {% endfor %}
                                     </select>
-                                    <button>✔</button>
+
+                                    <button type="submit">✔</button>
                                 </form>
                                 {% endif %}
 
                             </div>
+
                             {% else %}
                                 <span class="empty">—</span>
                             {% endif %}

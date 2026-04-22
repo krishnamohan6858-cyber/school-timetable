@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Grid Timetable</title>
+    <title>Timetable</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- INLINE EDIT SCRIPT -->
     <script>
     function enableEdit(btn) {
         const cell = btn.closest(".cell");
         cell.querySelector(".view-mode").style.display = "none";
-        cell.querySelector(".edit-mode").style.display = "block";
+        cell.querySelector(".edit-mode").style.display = "flex";
     }
 
     function cancelEdit(btn) {
         const cell = btn.closest(".cell");
         cell.querySelector(".edit-mode").style.display = "none";
-        cell.querySelector(".view-mode").style.display = "block";
+        cell.querySelector(".view-mode").style.display = "flex";
     }
 
     function saveEdit(btn, id) {
@@ -38,7 +37,7 @@
     }
 
     function deleteEntry(id) {
-        if (!confirm("Are you sure?")) return;
+        if (!confirm("Delete this entry?")) return;
 
         fetch(`/delete/${id}`, {
             method: "POST"
@@ -46,106 +45,120 @@
         .then(() => location.reload());
     }
     </script>
-
 </head>
 
 <body>
 
+<!-- NAVBAR -->
 <div class="navbar">
-    <h2 class="logo">📘 OISM Timetable</h2>
+    <div class="logo">📘 OISM Timetable</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/timetable">Timetable</a>
+        {% if 'admin' in session %}
+        <a href="/admin-dashboard">Admin</a>
+        {% endif %}
+        <a href="/logout">Logout</a>
+    </div>
 </div>
 
 <div class="container">
 
-    <h1>📅 School Grid Timetable</h1>
+    <h1>📅 Weekly Timetable</h1>
 
     <div class="table-container">
+        <table class="grid-table">
 
-    <table class="grid-table">
+            <!-- HEADER -->
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    {% for day in days %}
+                        <th>{{ day }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
 
-        <!-- HEADER -->
-        <thead>
-        <tr>
-            <th>Period</th>
-            {% for day in days %}
-                <th>{{ day }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
+            <!-- BODY -->
+            <tbody>
+            {% for p in periods %}
+            <tr>
+                <td class="period">{{ p }}</td>
 
-        <!-- BODY -->
-        <tbody>
-        {% for p in periods %}
-        <tr>
-            <td class="period">{{ p }}</td>
+                {% for day in days %}
+                <td>
 
-            {% for day in days %}
-            <td>
+                {% if grid[day][p] %}
+                <div class="cell">
 
-            {% if grid[day][p] %}
-            <div class="cell">
+                    <!-- VIEW MODE -->
+                    <div class="view-mode">
 
-                <!-- VIEW MODE -->
-                <div class="view-mode">
-                    <div class="subject">{{ grid[day][p].subject }}</div>
-                    <div class="class">{{ grid[day][p].class }}</div>
-                    <div class="teacher">👨‍🏫 {{ grid[day][p].teacher }}</div>
+                        <div class="subject">
+                            {{ grid[day][p].subject }}
+                        </div>
 
-                    {% if grid[day][p].substitute %}
-                    <div class="substitute">🔁 {{ grid[day][p].substitute }}</div>
-                    {% endif %}
+                        <div class="class">
+                            Class {{ grid[day][p].class }}
+                        </div>
 
+                        <div class="teacher">
+                            👨‍🏫 {{ grid[day][p].teacher }}
+                        </div>
+
+                        {% if grid[day][p].substitute %}
+                        <div class="substitute">
+                            🔁 {{ grid[day][p].substitute }}
+                        </div>
+                        {% endif %}
+
+                        {% if 'admin' in session %}
+                        <div class="grid-actions">
+                            <button class="edit-btn" onclick="enableEdit(this)">✏️</button>
+                            <button class="delete-btn" onclick="deleteEntry('{{ grid[day][p].id }}')">❌</button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- EDIT MODE -->
                     {% if 'admin' in session %}
-                    <div style="margin-top:5px;">
-                        <button onclick="enableEdit(this)">✏️ Edit</button>
-                        <button onclick="deleteEntry('{{ grid[day][p].id }}')">❌</button>
+                    <div class="edit-mode" style="display:none;">
+
+                        <input type="text" value="{{ grid[day][p].subject }}" placeholder="Subject">
+                        <input type="text" value="{{ grid[day][p].class }}" placeholder="Class">
+
+                        <select>
+                            {% for t in teachers %}
+                            <option value="{{ t }}" {% if t == grid[day][p].teacher %}selected{% endif %}>
+                                {{ t }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <div class="grid-actions">
+                            <button class="save-btn" onclick="saveEdit(this, '{{ grid[day][p].id }}')">💾</button>
+                            <button class="cancel-btn" onclick="cancelEdit(this)">↩</button>
+                        </div>
+
                     </div>
                     {% endif %}
+
                 </div>
 
-                <!-- EDIT MODE -->
-                {% if 'admin' in session %}
-                <div class="edit-mode" style="display:none;">
-                    <input type="text" value="{{ grid[day][p].subject }}" placeholder="Subject">
-                    <input type="text" value="{{ grid[day][p].class }}" placeholder="Class">
-
-                    <select>
-                        {% for t in teachers %}
-                        <option value="{{ t }}" {% if t == grid[day][p].teacher %}selected{% endif %}>
-                            {{ t }}
-                        </option>
-                        {% endfor %}
-                    </select>
-
-                    <button onclick="saveEdit(this, '{{ grid[day][p].id }}')">💾</button>
-                    <button onclick="deleteEntry('{{ grid[day][p].id }}')">❌</button>
-                </div>
+                {% else %}
+                    <span class="empty">—</span>
                 {% endif %}
 
-            </div>
-
-            {% else %}
-            <span class="empty">—</span>
-            {% endif %}
-
-            </td>
+                </td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
-        </tbody>
+            </tbody>
 
-    </table>
-
-    </div>
-
-    <br>
-
-    <div style="text-align:center;">
-        <a href="/" class="back-btn">⬅ Back</a>
+        </table>
     </div>
 
 </div>
 
 </body>
 </html>
-

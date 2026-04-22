@@ -6,6 +6,7 @@ import os
 import bcrypt
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret")
@@ -167,6 +168,24 @@ def get_busy_teachers(day, period):
     return busy
 
 
+def reset_daily_substitutions():
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    today = date.today()
+
+    # Reset anything not from today (i.e., yesterday or older)
+    cur.execute("""
+        UPDATE timetable
+        SET substitute = NULL, substitute_date = NULL
+        WHERE substitute_date IS NOT NULL
+        AND substitute_date < %s
+    """, (today,))
+
+    conn.commit()
+    conn.close()
+
+
 @app.route('/')
 def home():
     if 'admin' not in session:
@@ -254,6 +273,10 @@ def get_substitute(day, period):
 
 @app.route('/timetable')
 def timetable():
+
+    # 🔥 AUTO RESET (midnight logic)
+    reset_daily_substitutions()
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -268,17 +291,19 @@ def timetable():
         grid[d] = {}
 
     for row in data:
-        _, class_name, day, period, subject, teacher, substitute = row
+        # 👇 UPDATED unpacking (added substitute_date)
+        id, class_name, day, period, subject, teacher, substitute, substitute_date = row
 
         grid[day][period] = {
-            "id": row[0],
+            "id": id,
             "class": class_name,
             "subject": subject,
             "teacher": teacher,
-            "substitute": substitute
+            "substitute": substitute,
+            "substitute_date": substitute_date   # 🔥 IMPORTANT
         }
 
-    # Get teachers list (for manual substitute dropdown)
+    # Get teachers list (for dropdown)
     cur.execute("SELECT name FROM teachers")
     teachers = [t[0] for t in cur.fetchall()]
 
@@ -297,18 +322,19 @@ def timetable():
 @app.route('/update-substitute/<int:id>', methods=['POST'])
 def update_substitute(id):
     if 'admin' not in session:
-        return redirect('/admin-login')   # 🔒 KEY FIX
+        return redirect('/admin-login')
 
     substitute = request.form['substitute']
+    today = date.today()
 
     conn = get_db_connection()
     cur = conn.cursor()
 
     cur.execute("""
         UPDATE timetable
-        SET substitute=%s
+        SET substitute=%s, substitute_date=%s
         WHERE id=%s
-    """, (substitute, id))
+    """, (substitute, today, id))
 
     conn.commit()
     conn.close()
@@ -377,11 +403,13 @@ def mark_absent():
     conn = get_db_connection()
     cur = conn.cursor()
 
+    today = date.today()
+
     cur.execute("""
     UPDATE timetable
-    SET substitute=%s
+    SET substitute=%s, substitute_date=%s
     WHERE day=%s AND period=%s AND teacher=%s
-    """, (substitute, day, period, teacher))
+    """, (substitute, today, day, period, teacher))
 
     conn.commit()
     conn.close()
